@@ -1,0 +1,72 @@
+#main
+{
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+#title
+{
+  display: flex;
+  flex-direction: row;
+  flex: 10vh;
+  background: transparent;
+  justify-content: center;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+#stuff
+{
+  flex: 70vh;
+  display: flex;
+  flex-direction: column-reverse;
+  background: transparent;
+  color: white;
+  overflow: scroll;
+  font-family: Arial, sans-serif;
+  font-size: medium;
+  padding-left: 5vh;
+  padding-right: 5vh;
+}
+#stuff::-webkit-scrollbar
+{
+  display: none;
+}
+#type
+{
+  display: flex;
+  flex-direction: row;
+  flex: 15vh;
+  background: transparent;
+  justify-content: space-around;
+  position: sticky;
+}
+#footer
+{
+  flex: 5vh;
+  background: transparent;
+}
+#question
+{
+  width: 90vw;
+  height: 5vh;
+  border-radius: 5px;
+  background: transparent;
+  border-style: solid;
+  font-family: Arial, sans-serif;
+  font-size: medium;
+}
+#ask
+{
+  width: 5vw;
+  height: 6vh;
+  border-radius: 5px;
+  background: transparent;
+  border-style: solid;
+  font-family: Arial, sans-serif;
+  font-size: medium;
+  color: white;
+}
+input[type=text]
+{
+  color: white;
+}

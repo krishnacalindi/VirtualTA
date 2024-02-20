@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width>, initial-scale=1.0">
+    <title>Virtual TA</title>
+    <link rel="stylesheet"  href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body style="background-image: linear-gradient(-155deg, #303030 0%, #101010 100%); margin: 0">
+    <div id="main">
+      <div id="title">
+        <h1>Virtual TA</h1>
+      </div>
+      <div id="stuff">
+        {% for Convo in Conversation %}
+          <p>{{Convo}}</p>
+        {% endfor %}
+      </div>
+      <div id="type">
+        <form action="/" method="POST">
+          <input type="text" placeholder="Ask me anything..." name="question" id="question">
+        </form>
+      </div>
+      <div id="footer"></div>
+    </div>
+    </body>
+</html>
