@@ -15,5 +15,5 @@ class RegisterForm(FlaskForm):
     submit = SubmitField('Register')
 
 class DFAForm(FlaskForm):
-    otp = StringField('otp', validators=[DataRequired()])
+    otp = StringField('Secret code', validators=[DataRequired()])
     submit = SubmitField('Authenticate')

@@ -27,7 +27,7 @@ def logout():
 
 @app.route('/auth/sendmail')
 def sendmail():
-    mail_message = Message('Test', sender=app.config['MAIL_USERNAME'], recipients=[])
+    mail_message = Message('Test', sender=app.config['MAIL_USERNAME'], recipients=['krishnacalindi@outlook.com'])
     mail_message.body = 'Testing to see whether this works!'
     mail.send(mail_message)
     return redirect(url_for('dfa')) 

@@ -7,9 +7,6 @@
         <p>
             {{ form.otp.label }}<br>
             {{ form.otp() }}
-            {% for error in form.username.errors %}
-                <span style="color: red">{{ error }}</span>
-            {% endfor %}
         </p>
         <p>{{ form.submit() }}</p>
     </form>
