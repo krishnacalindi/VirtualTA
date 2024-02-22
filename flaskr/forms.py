@@ -13,3 +13,7 @@ class RegisterForm(FlaskForm):
     password = StringField('Password', validators=[DataRequired(), Length(min=5, max=15, message="Length of password must be 4-15 characters."), EqualTo('confirm', message="Passwords must match.")])
     confirm = StringField('Repeat password',  validators=[DataRequired(), Length(min=5, max=15, message="Length of password must be 4-15 characters.")])
     submit = SubmitField('Register')
+
+class DFAForm(FlaskForm):
+    otp = StringField('otp', validators=[DataRequired()])
+    submit = SubmitField('Authenticate')
