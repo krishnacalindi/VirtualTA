@@ -1,4 +1,4 @@
-from flask import render_template, url_for, request, redirect
+from flask import render_template, url_for, redirect
 from flaskr import app, mail
 from flaskr.forms import LoginForm, RegisterForm, DFAForm
 from flask_mail import Message
