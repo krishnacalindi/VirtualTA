@@ -9,16 +9,16 @@ def welcome():
 
 @app.route('/auth/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        return redirect(url_for('sendmail'))
     form = LoginForm()
+    if form.validate_on_submit():
+        return redirect(url_for('sendmail'))
     return render_template('auth/login.html', title="LogIn", form=form)
 
 @app.route('/auth/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        return "got form"
     form = RegisterForm()
+    if form.validate_on_submit():
+        return "got form"
     return render_template('auth/register.html', title="Register", form=form)
 
 @app.route('/auth/logout')
@@ -34,7 +34,8 @@ def sendmail():
 
 @app.route('/auth/dfa', methods=['GET', 'POST'])
 def dfa():
-    if request.method == 'POST':
+    form = DFAForm()
+    if form.validate_on_submit():
         return "got dfa"
     form = DFAForm()
     return render_template('auth/dfa.html', title="Dual Factor Authentication", form=form)
