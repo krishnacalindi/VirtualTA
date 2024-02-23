@@ -1,13 +1,12 @@
 {% extends "base.html" %}
 
 {% block body %}
-    <h1>Dual Factor Authentication</h1>
     <form action="" method="POST" novalidate>
         {{ form.hidden_tag() }}
         <p>
             {{ form.otp.label }}<br>
             {{ form.otp() }}
         </p>
-        <p>{{ form.submit() }}</p>
+        <p>{{ form.submit(class="submit_field") }}</p>
     </form>
 {% endblock %}

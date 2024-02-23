@@ -8,14 +8,36 @@
     {% else %}
     <title>VirtualTA</title>
     {% endif %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     {% block head %}{% endblock %}
 </head>
-<body>
-    <div><a href="{{ url_for('welcome') }}">Home</a></div>
-    <div><a href="{{ url_for('login') }}">LogIn</a></div>
-    <div><a href="{{ url_for('register') }}">Register</a></div>
-    <div><a href="{{ url_for('logout') }}">LogOut</a></div>
-    <hr>
-    {% block body %}{% endblock %}
+<body style="font-family: Verdana, Geneva, Tahoma, sans-serif; display: flex; flex-direction: column;margin: 0; 
+background-image: linear-gradient(155deg, #202020 0%, black 100%); color: #f5f5f5">
+    <div id="base_header">
+        <div id="base_header_left">
+            <a href="{{ url_for('welcome') }}" class="silent_link">Home</a>
+        </div>
+        <div id="base_header_center">
+            {{title}}
+        </div>
+        <div id="base_header_right">
+            {% for link in links %}
+                <a href="{{ url_for(link[0]) }}" class="silent_link">{{link[1]}}</a>
+            {% endfor %} 
+        </div>
+    </div>
+    <div id="base_body">
+        {% block body %}{% endblock %}
+    </div>
+    <div id="base_footer">
+        <p style="margin:0">Creators: <a href="https://www.linkedin.com/in/adam-mccutcheon-3a5128240/" class="silent_link" target="_blank">Adam McCutcheon</a>, 
+        <a href="https://www.linkedin.com/in/amermeer/" class="silent_link" target="_blank">Amer Mustafa Meer</a>, 
+        <a href="https://www.linkedin.com/in/peter-driscoll/" class="silent_link" target="_blank">Peter Wang Driscoll</a>, 
+        <a href="" class="silent_link" target="_blank">Juan Tavira</a>, 
+        <a href="https://www.linkedin.com/in/krishna-calindi/" class="silent_link" target="_blank">Krishna Calindi</a></p>
+        <p style="margin:0">Professor: <a href="https://personal.utdallas.edu/~pkumar/" class="silent_link" target="_blank">Dr. Pushpa Kumar</a></p>
+        <p style="margin:0">University: <a href="https://www.utdallas.edu/" class="silent_link" target="_blank">The University of Texas at Dallas</a>, 
+        <a href="https://engineering.utdallas.edu/" class="silent_link" target="_blank">Eric Jonsson School of Engineering and Computer Science</a></p>
+    </div>
 </body>
 </html>

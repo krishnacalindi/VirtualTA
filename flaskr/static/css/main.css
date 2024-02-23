@@ -1,0 +1,92 @@
+#base_header
+{
+    flex: 10vh;
+    display: flex;
+    flex-direction: row;
+    #base_header_left
+    {
+        flex: 10vw;
+        display: flex;
+        flex-direction: column;
+        font-size: large;
+        align-items: center;
+        justify-content: center;
+    }
+    #base_header_center
+    {
+        flex: 80vw;
+        display: flex;
+        flex-direction: column;
+        font-size: 65px;
+        align-items: center;
+        justify-content: center;
+    }
+    #base_header_right
+    {
+        flex: 10vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+}
+#base_body
+{
+    flex: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#base_footer
+{
+    flex: 10vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+.silent_link
+{
+    color: #f5f5f5;
+    text-decoration: none;
+    &:visited
+    {
+        color: #f5f5f5;
+    }
+    &:hover
+    {
+        cursor: pointer;
+        text-decoration: underline;
+    }
+}
+input
+{
+    width: 30vw;
+    padding: 5px;
+    border-radius: 5px;
+    border: solid;
+    background-color: beige;
+    &:focus
+    {
+        background-color: white;
+        
+    }
+}
+.submit_field
+{
+    background-color: beige;
+    width: fit-content;
+    padding: 10px;
+    font-size: 15px;
+    font-weight: bold;
+    &:hover
+    {
+        cursor: pointer;
+        background-color: white;
+    }
+}
+.form_error_message
+{
+    color: red;
+    font-size: x-small;
+}

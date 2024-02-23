@@ -1,37 +1,36 @@
 {% extends "base.html" %}
 
 {% block body %}
-    <h1>Register</h1>
     <form action="" method="POST" novalidate>
         {{ form.hidden_tag() }}
         <p>
             {{ form.email.label }}<br>
             {{ form.email() }}
             {% for error in form.email.errors %}
-                <span style="color: red">{{ error }}</span>
+                <p class="form_error_message">{{ error }}</p>
             {% endfor %}
         </p>
         <p>
             {{ form.username.label }}<br>
             {{ form.username() }}
             {% for error in form.username.errors %}
-                <span style="color: red">{{ error }}</span>
+                <p class="form_error_message">{{ error }}</p>
             {% endfor %}
         </p>
         <p>
             {{ form.password.label }}<br>
             {{ form.password() }}
             {% for error in form.password.errors %}
-                <span style="color: red">{{ error }}</span>
+                <p class="form_error_message">{{ error }}</p>
             {% endfor %}
         </p>
         <p>
             {{ form.confirm.label }}<br>
             {{ form.confirm() }}
             {% for error in form.confirm.errors %}
-                <span style="color: red">{{ error }}</span>
+                <p class="form_error_message">{{ error }}</p>
             {% endfor %}
         </p>
-        <p>{{ form.submit() }}</p>
+        <p">{{ form.submit(class="submit_field") }}</p>
     </form>
 {% endblock %}

@@ -5,21 +5,21 @@ from flask_mail import Message
 
 @app.route('/')
 def welcome():
-    return render_template('welcome.html', title="Welcome")
+    return render_template('welcome.html', title="Welcome", links=[['login', 'Login'], ['register', 'Register']])
 
 @app.route('/auth/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         return redirect(url_for('sendmail'))
-    return render_template('auth/login.html', title="LogIn", form=form)
+    return render_template('auth/login.html', title="Login", form=form, links=[['welcome', 'Home'], ['register', 'Register']])
 
 @app.route('/auth/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
         return "got form"
-    return render_template('auth/register.html', title="Register", form=form)
+    return render_template('auth/register.html', title="Register", form=form, links=[['welcome', 'Home'], ['login', 'Login']])
 
 @app.route('/auth/logout')
 def logout():
