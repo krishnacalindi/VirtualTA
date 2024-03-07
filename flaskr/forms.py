@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, FileField
+from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, InputRequired
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -33,3 +33,7 @@ class RegisterForm(FlaskForm):
 class DFAForm(FlaskForm):
     otp = StringField('Secret code', validators=[DataRequired()])
     submit = SubmitField('Authenticate')
+
+class SyllabusForm(FlaskForm):
+    syllabus = FileField('Upload syllabus', validators=[InputRequired()])
+    submit = SubmitField('Upload')

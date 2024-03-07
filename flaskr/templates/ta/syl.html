@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+    <form action="" method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.syllabus.label }}<br>
+            {{ form.syllabus() }}
+            {% for error in form.syllabus.errors %}
+                <p class="form_error_message">{{ error }}</p>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit(class="submit_field") }}</p>
+    </form>
+{% endblock %}

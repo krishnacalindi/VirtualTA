@@ -1,6 +1,6 @@
 from flask import render_template, url_for, redirect
 from flaskr import app, mail
-from flaskr.forms import LoginForm, RegisterForm, DFAForm
+from flaskr.forms import LoginForm, RegisterForm, DFAForm, SyllabusForm
 from flask_mail import Message
 
 @app.route('/')
@@ -37,5 +37,19 @@ def dfa():
     form = DFAForm()
     if form.validate_on_submit():
         return "got dfa"
-    form = DFAForm()
     return render_template('auth/dfa.html', title="Dual Factor Authentication", form=form)
+
+@app.route('/stu/land')
+def stu_land():
+    return render_template('/stu/land.html', title="Student - Home" ,links=[['logout', 'Logout']])
+
+@app.route('/ta/land')
+def ta_land():
+    return render_template('/stu/land.html', title="TA - Home" ,links=[['logout', 'Logout'], ['ta_syl', 'Syllabus']])
+
+@app.route('/ta/syl', methods=['GET', 'POST'])
+def ta_syl():
+    form = SyllabusForm()
+    if form.validate_on_submit():
+        return "got the syllabus!"
+    return render_template('ta/syl.html', title="TA - Syllabus", form=form, links=[['logout', 'Logout']])
