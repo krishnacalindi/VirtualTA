@@ -32,17 +32,17 @@ class RegisterForm(FlaskForm):
             raise ValidationError('Not a strong password.')
     def validate_username(self, username):
         cursor = conn.cursor()
-        validate_username_command = 'SELECT * FROM user_info WHERE username=' + username.data
+        validate_username_command = "SELECT * FROM user_info WHERE username='" + username.data + "';"
         cursor.execute(validate_username_command)
-        conn.commit()
-        if cursor is not None:
+        user_data = cursor.fetchone()
+        if user_data is not None:
             raise ValidationError('Please use a different username.')
     def validate_email(self, email):
         cursor = conn.cursor()
-        validate_email_command = 'SELECT * FROM user_info WHERE email=' + email.data
+        validate_email_command = "SELECT * FROM user_info WHERE email='" + email.data + "';"
         cursor.execute(validate_email_command)
-        conn.commit()
-        if cursor is not None:
+        user_data = cursor.fetchone()
+        if user_data is not None:
             raise ValidationError('Please use a different email.')
 
 class DFAForm(FlaskForm):
