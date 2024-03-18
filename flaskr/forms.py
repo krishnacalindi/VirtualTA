@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, FileField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, InputRequired
+from flaskr import conn
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -28,7 +29,21 @@ class RegisterForm(FlaskForm):
                     if specialChar == c:
                         specialcharVal = True
         if not (lowercaseVal and uppercaseVal and specialcharVal):
-            raise ValidationError('Not a strong password')
+            raise ValidationError('Not a strong password.')
+    def validate_username(self, username):
+        cursor = conn.cursor()
+        validate_username_command = 'SELECT * FROM user_info WHERE username=' + username.data
+        cursor.execute(validate_username_command)
+        conn.commit()
+        if cursor is not None:
+            raise ValidationError('Please use a different username.')
+    def validate_email(self, email):
+        cursor = conn.cursor()
+        validate_email_command = 'SELECT * FROM user_info WHERE email=' + email.data
+        cursor.execute(validate_email_command)
+        conn.commit()
+        if cursor is not None:
+            raise ValidationError('Please use a different email.')
 
 class DFAForm(FlaskForm):
     otp = StringField('Secret code', validators=[DataRequired()])

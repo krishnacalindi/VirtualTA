@@ -10,3 +10,8 @@ class Config:
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_USE_TLS = True
     MAIL_USE_SSL = False
+    DB_SERVER = os.environ.get('DB_SERVER')
+    DB_NAME = os.environ.get('DB_NAME')
+    DB_USERNAME = os.environ.get('DB_USERNAME')
+    DB_PASSWORD = os.environ.get('DB_PASSWORD')
+    DB_DRIVER = os.environ.get('DB_DRIVER')
