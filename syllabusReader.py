@@ -56,36 +56,55 @@ def insert_data(table_name, section, content):
     cursor.execute(f"INSERT INTO {table_name} (section, content) VALUES (?, ?)", (section, content))
     conn.commit()
 
-import re
-
 def parse_syllabus(file_contents):
     """Parse syllabus contents."""
     syllabus_info = {}
     
-    # Define regular expression pattern to match section titles
-    section_pattern = re.compile(r"Section \d+", re.IGNORECASE)
+    # Define the keywords we're interested in
+    keywords = [
+        'course and section',
+        'course_description',
+        'homework',
+        'exams',
+        'class_time',
+        'office_hours',
+        'grade_distribution',
+        'attendance',
+        'textbook',
+        'instructor',
+        'TA',
+        'miscellaneous'
+    ]
     
-    # Split the syllabus content into sections based on the section pattern
-    sections = section_pattern.split(file_contents)[1:]
+    # Split the syllabus content into sections
+    sections = file_contents.split("Course Syllabus   Page ")[1:]
     
-    for i, section_text in enumerate(sections):
-        # Extract section title
-        section_title = "Section " + str(i + 1)
-        
-        # Extract content (excluding section title)
-        content_start_index = file_contents.find(section_text)
-        content_end_index = content_start_index + len(section_text)
-        content = file_contents[content_end_index:]
-        
-        # Store section title and content
-        syllabus_info[section_title] = {
-            "content": section_text.strip(),
-            "homework": "",  # Update with actual extraction logic
-            "exam": "",      # Update with actual extraction logic
-            # Add other fields as needed
-        }
+    # Initialize content dictionary for the section
+    section_content = {}
+    
+    # Iterate through keywords and extract corresponding content
+    for j in range(len(keywords)):
+        keyword_start_index = file_contents.find(keywords[j])
+        if keyword_start_index != -1:
+            # Find the end index for the current keyword
+            next_keyword_index = file_contents.find(keywords[j + 1]) if j + 1 < len(keywords) else file_contents.find("End of Syllabus")
+            keyword_end_index = next_keyword_index if next_keyword_index != -1 else len(file_contents)
+            
+            # Extract content based on the current keyword
+            content = file_contents[keyword_start_index+len(keywords[j]):keyword_end_index].strip()
+            
+            # Store content in the section dictionary
+            section_content[keywords[j]] = content
+    
+    # Ensure all keywords are added to the dictionary even if their content is empty
+    for keyword in keywords:
+        section_content.setdefault(keyword, '')
+    
+    # Store content in the syllabus dictionary
+    syllabus_info['Course'] = section_content
     
     return syllabus_info
+
 
 
 def extract_text_from_pdf(pdf_path):
@@ -103,16 +122,77 @@ if __name__ == "__main__":
     pdf_text = extract_text_from_pdf(pdf_path)
     syllabus_info = parse_syllabus(pdf_text)
 
-    # Print out the parsed syllabus information
-    for section, info in syllabus_info.items():
-        print(f"Section: {section}")
-        print(f"Content: {info['content']}")
+# Print out the parsed syllabus information
+for section, info in syllabus_info.items():
+    print(f"Section: {section}")
+    
+    # Print course description
+    if 'course_description' in info:
+        print(f"Content: {info['course_description']}")
+    else:
+        print("No course description available")
+    
+    # Print homework information
+    if 'homework' in info:
         print(f"Homework: {info['homework']}")
-        print(f"Exam: {info['exam']}")
+    else:
+        print("No homework information available")
+    
+    # Print exam information
+    if 'exams' in info:
+        print(f"Exam: {info['exams']}")
+    else:
+        print("No exam information available")
+    
+    # Print class time
+    if 'class_time' in info:
+        print(f"Class Time: {info['class_time']}")
+    else:
+        print("No class time information available")
+    
+    # Print office hours
+    if 'office_hours' in info:
+        print(f"Office Hours: {info['office_hours']}")
+    else:
+        print("No office hours information available")
+    
+    # Print grade distribution
+    if 'grade_distribution' in info:
+        print(f"Grade Distribution: {info['grade_distribution']}")
+    else:
+        print("No grade distribution information available")
+    
+    # Print attendance
+    if 'attendance' in info:
+        print(f"Attendance: {info['attendance']}")
+    else:
+        print("No attendance information available")
+    
+    # Print textbook
+    if 'textbook' in info:
+        print(f"Textbook: {info['textbook']}")
+    else:
+        print("No textbook information available")
+    
+    # Print instructor
+    if 'instructor' in info:
+        print(f"Instructor: {info['instructor']}")
+    else:
+        print("No instructor information available")
+    
+    # Print TA
+    if 'TA' in info:
+        print(f"TA: {info['TA']}")
+    else:
+        print("No TA information available")
+    
+    # Print miscellaneous
+    if 'miscellaneous' in info:
+        print(f"Miscellaneous: {info['miscellaneous']}")
+    else:
+        print("No miscellaneous information available")
 
-    # Insert parsed syllabus information into the database
-    for section, info in syllabus_info.items():
-        insert_data("syllabi", section, info["content"])
+
      
     print("Syllabus information saved to the database.")
 
