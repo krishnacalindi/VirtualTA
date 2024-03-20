@@ -1,95 +1,92 @@
-import sqlite3
+import pyodbc
 import PyPDF2
 import json
 
-DATABASE = 'syllabus.db'
+# Connection string details
+server = 'group72.database.windows.net'
+database = 'Group72'
+username = 'MeepLeader'
+password = '5_of_us_in_group_72'
+driver = '{ODBC Driver 18 for SQL Server}'
+
+# Connect to the database
+conn_str = (
+    f"Driver={driver};"
+    f"Server={server};"
+    f"Database={database};"
+    f"Uid={username};"
+    f"Pwd={password};"
+    "Encrypt=yes;"
+    "TrustServerCertificate=no;"
+    "Connection Timeout=30;"
+)
+conn = pyodbc.connect(conn_str)
+cursor = conn.cursor()
 
 def create_database():
-    """Create SQLite database and syllabi table if they don't exist."""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS syllabi
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                 file_name TEXT,
-                 section TEXT,
-                 content TEXT)''')
-    conn.commit()
-    conn.close()
+    """Create syllabi table if it doesn't exist."""
+    cursor.execute('''IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'syllabi')
+                      CREATE TABLE syllabi (
+                          id INT PRIMARY KEY IDENTITY(1,1),
+                          file_name NVARCHAR(255),
+                          section NVARCHAR(255),
+                          course_description NVARCHAR(MAX),
+                          homework NVARCHAR(MAX),
+                          exam NVARCHAR(MAX),
+                          class_time NVARCHAR(MAX),
+                          office_hours NVARCHAR(MAX),
+                          grade_distribution NVARCHAR(MAX),
+                          attendance NVARCHAR(MAX),
+                          textbook NVARCHAR(MAX),
+                          instructor NVARCHAR(MAX),
+                          TA NVARCHAR(MAX),
+                          miscellaneous NVARCHAR(MAX)
+                      )''')
 
 def insert_syllabus_info(file_name, syllabus_info):
     """Insert syllabus information into the database."""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('''INSERT INTO syllabi (file_name, content)
-                 VALUES (?, ?)''', (file_name, json.dumps(syllabus_info)))
+    for section, info in syllabus_info.items():
+        cursor.execute("INSERT INTO syllabi (file_name, section, course_description, homework, exam, class_time, office_hours, grade_distribution, attendance, textbook, instructor, TA, miscellaneous) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                       (file_name, section, info.get('content', ''), info.get('homework', ''), info.get('exam', ''), info.get('class_time', ''), info.get('office_hours', ''), info.get('grade_distribution', ''), info.get('attendance', ''), info.get('textbook', ''), info.get('instructor', ''), info.get('TA', ''), info.get('miscellaneous', '')))
     conn.commit()
-    conn.close()
+
+
+def insert_data(table_name, section, content):
+    """Insert data into the specified table."""
+    cursor.execute(f"INSERT INTO {table_name} (section, content) VALUES (?, ?)", (section, content))
+    conn.commit()
+
+import re
 
 def parse_syllabus(file_contents):
     """Parse syllabus contents."""
     syllabus_info = {}
     
-    # Split the syllabus content into sections
-    sections = file_contents.split("Course Syllabus   Page ")[1:]
+    # Define regular expression pattern to match section titles
+    section_pattern = re.compile(r"Section \d+", re.IGNORECASE)
     
-def parse_syllabus(file_contents):
-    """Parse syllabus contents."""
-    syllabus_info = {}
-    
-    # Split the syllabus content into sections
-    sections = file_contents.split("Course Syllabus   Page ")[1:]
+    # Split the syllabus content into sections based on the section pattern
+    sections = section_pattern.split(file_contents)[1:]
     
     for i, section_text in enumerate(sections):
         # Extract section title
         section_title = "Section " + str(i + 1)
         
-        # Extract content
-        content_start_index = section_text.find("Course Description")
-        content_end_index = section_text.find("Student Learning Objectives/Outcomes")
-        content = section_text[content_start_index:content_end_index]
-
-        # Extract and store homework assignments
-        homework_start_index = content.find("Homework")
-        homework_end_index = content.find("Projects")
-        homework_content = content[homework_start_index:homework_end_index]
+        # Extract content (excluding section title)
+        content_start_index = file_contents.find(section_text)
+        content_end_index = content_start_index + len(section_text)
+        content = file_contents[content_end_index:]
         
-        # Extract and store exam info
-        exam_start_index = content.find("Midterm")
-        exam_end_index = content.find("Exam/Final")
-        exam_content = content[exam_start_index:exam_end_index]
-        
-        # Extract and store class meeting time and location
-        class_time_index = content.find("Class meeting time and location")
-        class_time_end_index = content.find("Office Hours")
-        class_time_content = content[class_time_index:class_time_end_index]
-
-        # Extract and store office hours
-        office_hours_index = content.find("Office Hours")
-        office_hours_end_index = content.find("Grade Distribution")
-        office_hours_content = content[office_hours_index:office_hours_end_index]
-
-        # Extract and store grade distribution
-        grade_dist_index = content.find("Grade Distribution")
-        grade_dist_end_index = content.find("Attendance")
-        grade_dist_content = content[grade_dist_index:grade_dist_end_index]
-
-        # Extract and store attendance policy
-        attendance_index = content.find("Attendance")
-        attendance_end_index = content.find("End of Syllabus")
-        attendance_content = content[attendance_index:attendance_end_index]
-
         # Store section title and content
         syllabus_info[section_title] = {
-            "content": content.strip(),
-            "homework": homework_content.strip(),
-            "exam": exam_content.strip(),
-            "class_time": class_time_content.strip(),
-            "office_hours": office_hours_content.strip(),
-            "grade_distribution": grade_dist_content.strip(),
-            "attendance": attendance_content.strip()
+            "content": section_text.strip(),
+            "homework": "",  # Update with actual extraction logic
+            "exam": "",      # Update with actual extraction logic
+            # Add other fields as needed
         }
     
     return syllabus_info
+
 
 def extract_text_from_pdf(pdf_path):
     """Extract text from a PDF file."""
@@ -105,5 +102,20 @@ if __name__ == "__main__":
     pdf_path = '/Users/juanctavira/Desktop/AIsyllabus.pdf'
     pdf_text = extract_text_from_pdf(pdf_path)
     syllabus_info = parse_syllabus(pdf_text)
-    insert_syllabus_info(pdf_path, syllabus_info)
+
+    # Print out the parsed syllabus information
+    for section, info in syllabus_info.items():
+        print(f"Section: {section}")
+        print(f"Content: {info['content']}")
+        print(f"Homework: {info['homework']}")
+        print(f"Exam: {info['exam']}")
+
+    # Insert parsed syllabus information into the database
+    for section, info in syllabus_info.items():
+        insert_data("syllabi", section, info["content"])
+     
     print("Syllabus information saved to the database.")
+
+# Close the cursor and the connection
+cursor.close()
+conn.close()
