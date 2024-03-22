@@ -34,7 +34,6 @@ def register():
              flash("An error occured while registering user.")
         else:
              flash("Successfully registered user.")
-        return render_template('auth/login.html', title="Login", form=form, links=[['welcome', 'Home'], ['register', 'Register']])
     return render_template('auth/register.html', title="Register", form=form, links=[['welcome', 'Home'], ['login', 'Login']])
 
 @app.route('/auth/logout')
@@ -51,7 +50,7 @@ def sendmail():
     otp = ""
     for i in range(4) :
         otp += numbers[random.randint(0, 9)]
-    session[otp] = otp
+    session['otp'] = otp
     mail_message.body = 'OTP = ' + otp
     mail.send(mail_message)
     return redirect(url_for('dfa')) 
@@ -61,7 +60,7 @@ def sendmail():
 def dfa():
     form = DFAForm()
     if form.validate_on_submit():
-        if session[dfa] == form.otp.data:
+        if session['otp'] == form.otp.data:
             return redirect(url_for('stu_land'))
         else:
              flash('Incorrect one time password.')
