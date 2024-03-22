@@ -51,7 +51,7 @@ def sendmail():
     for i in range(4) :
         otp += numbers[random.randint(0, 9)]
     session['otp'] = otp
-    mail_message.body = 'OTP = ' + otp
+    mail_message.html = render_template('mail/otp.html', ott=otp)
     mail.send(mail_message)
     return redirect(url_for('dfa')) 
 
