@@ -42,9 +42,8 @@ class User(UserMixin):
     def createUser(username, email, passwordhash):
         cursor = conn.cursor()
         register_user_command = "INSERT INTO user_info (username, email, passwordhash) VALUES (?, ?, ?);"
-        print(register_user_command, (username, email, passwordhash))
         try:
-            cursor.execute(register_user_command)
+            cursor.execute(register_user_command,(username, email, passwordhash))
             conn.commit()
             return User(-1, username, email, passwordhash, -1)
         except:
