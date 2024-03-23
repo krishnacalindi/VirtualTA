@@ -10,15 +10,15 @@ class LoginForm(FlaskForm):
 
 class RegisterForm(FlaskForm):
     email = StringField('E-Mail', validators=[DataRequired(), Email()])
-    username = StringField('Username', validators=[DataRequired(), Length(min=5, max=15, message="Length of username must be 4-15 characters.")])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=5, max=15, message="Length of password must be 4-15 characters."), EqualTo('confirm', message="Passwords must match.")])
-    confirm = PasswordField('Repeat password',  validators=[DataRequired(), Length(min=5, max=15, message="Length of password must be 4-15 characters.")])
+    username = StringField('Username', validators=[DataRequired(), Length(min=5, max=15, message="Length of username must be 5-15 characters.")])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=5, max=15, message="Length of password must be 5-15 characters."), EqualTo('confirm', message="Passwords must match.")])
+    confirm = PasswordField('Repeat password',  validators=[DataRequired(), Length(min=5, max=15, message="Length of password must be 5-15 characters.")])
     submit = SubmitField('Register')
     def validate_password(self, password):
         lowercaseVal = False
         uppercaseVal = False
         specialcharVal = False
-        specialChars = '[@_!#$%^&*()<>?/\|}{~:]'
+        specialChars = "[@_!#$%^&*()<>?/\|}{~:]"
         for c in password.data:
             if c.islower():
                 lowercaseVal = True
@@ -32,15 +32,15 @@ class RegisterForm(FlaskForm):
             raise ValidationError('Not a strong password.')
     def validate_username(self, username):
         cursor = conn.cursor()
-        validate_username_command = "SELECT * FROM user_info WHERE username='" + username.data + "';"
-        cursor.execute(validate_username_command)
+        validate_username_command = "SELECT * FROM user_info WHERE username = ?;"
+        cursor.execute(validate_username_command, (username,))
         user_data = cursor.fetchone()
         if user_data is not None:
             raise ValidationError('Please use a different username.')
     def validate_email(self, email):
         cursor = conn.cursor()
-        validate_email_command = "SELECT * FROM user_info WHERE email='" + email.data + "';"
-        cursor.execute(validate_email_command)
+        validate_email_command = "SELECT * FROM user_info WHERE email = ?"
+        cursor.execute(validate_email_command, (email, ))
         user_data = cursor.fetchone()
         if user_data is not None:
             raise ValidationError('Please use a different email.')

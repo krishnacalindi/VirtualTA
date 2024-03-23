@@ -28,7 +28,7 @@ class User(UserMixin):
     
     def getUserFromID(id):
         cursor = conn.cursor()
-        user_load_command = "SELECT * FROM user_info WHERE id = ?"
+        user_load_command = "SELECT * FROM user_info WHERE id = ?;"
         try:
             cursor.execute(user_load_command, (id,))
             temp_row = cursor.fetchone()
