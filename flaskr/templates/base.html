@@ -15,13 +15,15 @@
 background-image: linear-gradient(155deg, #202020 0%, black 100%); color: #f5f5f5">
     <div id="base_header">
         <div id="base_header_left">
-            <a href="{{ url_for('welcome') }}" class="silent_link">Home</a>
+            {% for link in leftlinks %}
+                <a href="{{ url_for(link[0]) }}" class="silent_link">{{link[1]}}</a>
+            {% endfor %}
         </div>
         <div id="base_header_center">
             {{title}}
         </div>
         <div id="base_header_right">
-            {% for link in links %}
+            {% for link in rightlinks %}
                 <a href="{{ url_for(link[0]) }}" class="silent_link">{{link[1]}}</a>
             {% endfor %} 
         </div>

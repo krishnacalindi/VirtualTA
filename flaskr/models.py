@@ -4,16 +4,20 @@ from werkzeug.security import check_password_hash
 
 class User(UserMixin):
     def __init__(self, id, username, email, passwordhash, ta):
-        if id != -1:
+        if id == -1:
+            self.username = username
+            self.email = email
+            self.passwordhash = passwordhash
+            
+        elif id == -2:
+            self.email = email
+            self.ta = ta
+        else:
             self.id = id
             self.username = username
             self.email = email
             self.passwordhash = passwordhash
             self.ta = ta
-        else:
-            self.username = username
-            self.email = email
-            self.passwordhash = passwordhash
 
     def getUser(username, password):
         cursor = conn.cursor()
@@ -39,6 +43,20 @@ class User(UserMixin):
         except:
             return None
     
+    def getUserFromEmail(email):
+        cursor = conn.cursor()
+        user_load_command = "SELECT * FROM user_info WHERE email = ?;"
+        try:
+            email = str(email)
+            cursor.execute(user_load_command, (email,))
+            temp_row = cursor.fetchone()
+            if temp_row is not None:
+                return  User(temp_row[0], temp_row[1], temp_row[2], temp_row[3], temp_row[4])
+            else:
+                return None
+        except:
+            return None
+
     def createUser(username, email, passwordhash):
         cursor = conn.cursor()
         register_user_command = "INSERT INTO user_info (username, email, passwordhash) VALUES (?, ?, ?);"
