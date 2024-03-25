@@ -33,14 +33,16 @@ class RegisterForm(FlaskForm):
     def validate_username(self, username):
         cursor = conn.cursor()
         validate_username_command = "SELECT * FROM user_info WHERE username = ?;"
+        username = str(username)
         cursor.execute(validate_username_command, (username,))
         user_data = cursor.fetchone()
         if user_data is not None:
             raise ValidationError('Please use a different username.')
     def validate_email(self, email):
         cursor = conn.cursor()
-        validate_email_command = "SELECT * FROM user_info WHERE email = ?"
-        cursor.execute(validate_email_command, (email, ))
+        validate_email_command = "SELECT * FROM user_info WHERE email = ?;"
+        email = str(email)
+        cursor.execute(validate_email_command, (email,))
         user_data = cursor.fetchone()
         if user_data is not None:
             raise ValidationError('Please use a different email.')
