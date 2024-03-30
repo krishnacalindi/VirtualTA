@@ -24,7 +24,7 @@ def virtual_ta_question(question, syllabus_text):
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are a teaching assistant for university level courses at the University of Texas at Dallas."},
+            {"role": "system", "content": "You are a teaching assistant for university level courses at the University of Texas at Dallas. Provide concise responses unless otherwise instructed by the student. Cite your responses, page number / line number from syllabus."},
             {"role": "system", "content": syllabus_text},  # Adding syllabus text as context
             {"role": "user", "content": question},
         ]
@@ -35,7 +35,7 @@ def virtual_ta_question(question, syllabus_text):
 # Main function to interact with user
 def main():
     # Path to the syllabus PDF file
-    syllabus_pdf_path = r'C:\Users\Owner\Desktop\TAopenAI\syllabus.pdf'
+    syllabus_pdf_path = r'C:\Users\Owner\Desktop\TAopenAI\Syllabus.pdf'
 
     # Extract text from syllabus PDF
     syllabus_text = extract_text_from_pdf(syllabus_pdf_path)
@@ -50,3 +50,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
