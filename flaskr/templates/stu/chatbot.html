@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+    <div id="chatbot">
+        <div id="stuff">
+        {% for convo in conversation %}
+            <p>{{convo}}</p>
+        {% endfor %}
+        </div>
+        <div id="type">
+        <form action="" method="POST">
+            <input type="text" placeholder="Ask me anything..." name="question" id="question">
+        </form>
+        </div>
+    </div>
+{% endblock %}

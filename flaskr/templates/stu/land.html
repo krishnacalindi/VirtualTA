@@ -4,5 +4,10 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Welcome to student landing page!</h1>
+    <h2>Courses:</h2>
+    <ul>
+        {% for course in courses %}
+            <li><a href="{{ url_for('stu_chatbot', id=course[0]) }}" class="silent_link">{{course[1]}}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock %}

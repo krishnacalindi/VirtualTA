@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileRequired, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, FileField
-from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, InputRequired
+from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
 from flaskr import conn
 
 class LoginForm(FlaskForm):
@@ -52,5 +53,5 @@ class DFAForm(FlaskForm):
     submit = SubmitField('Authenticate')
 
 class SyllabusForm(FlaskForm):
-    syllabus = FileField('Upload syllabus', validators=[InputRequired()])
+    syllabus = FileField('Upload syllabus', validators=[FileRequired(), FileAllowed(['.pdf'], "Please upload PDF files only.")])
     submit = SubmitField('Upload')

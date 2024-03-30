@@ -1,16 +1,17 @@
-from flask import render_template, url_for, redirect, flash, session
+from flask import render_template, url_for, redirect, flash, session, request
 from flaskr import app, mail, conn
 from flaskr.forms import LoginForm, RegisterForm, DFAForm, SyllabusForm
+from flaskr.models import User
 from flask_mail import Message
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash
-from flaskr.models import User
-import random
+import pyotp
+conversation = []
 
 @app.route('/')
 def welcome():
     if current_user.is_authenticated:
-        if session['ta'] == 1:
+        if current_user.ta == 1:
             return redirect(url_for('ta_land'))
         else:
             return redirect(url_for('stu_land'))
@@ -19,7 +20,7 @@ def welcome():
 @app.route('/auth/login', methods=['GET', 'POST'])
 def login(): 
     if current_user.is_authenticated:
-        if session['ta'] == 1:
+        if current_user.ta == 1:
             return redirect(url_for('ta_land'))
         else:
             return redirect(url_for('stu_land'))
@@ -31,14 +32,13 @@ def login():
             return redirect(url_for('login'))
         else:
             session['email'] = user.email
-            session['ta'] = user.ta
             return redirect(url_for('sendmail'))
     return render_template('auth/login.html', title="Login", form=form, leftlinks = [['welcome', 'Home']], rightlinks=[['register', 'Register']])
 
 @app.route('/auth/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        if session['ta'] == 1:
+        if current_user.ta == 1:
             return redirect(url_for('ta_land'))
         else:
             return redirect(url_for('stu_land'))
@@ -56,25 +56,24 @@ def register():
 @app.route('/auth/logout')
 @login_required
 def logout():
-    session.clear()
     logout_user()
+    session.clear()
     return redirect(url_for('welcome'))
 
 @app.route('/auth/sendmail')
 def sendmail():
     if current_user.is_authenticated:
-        if session['ta'] == 1:
+        if current_user.ta == 1:
             return redirect(url_for('ta_land'))
         else:
             return redirect(url_for('stu_land'))
     try:
         email = session['email']
         mail_message = Message('One Time Password', sender=app.config['MAIL_USERNAME'], recipients=[email])
-        numbers = "0123456789"
-        otp = ""
-        for i in range(4) :
-            otp += numbers[random.randint(0, 9)]
-        session['otp'] = otp
+        secret_key = pyotp.random_base32()
+        totp = pyotp.TOTP(secret_key, interval=300, digits=6)
+        otp = totp.now()
+        session['secret_key'] = secret_key
         mail_message.html = render_template('mail/otp.html', otp=otp)
         mail.send(mail_message)
         return redirect(url_for('dfa')) 
@@ -86,7 +85,7 @@ def sendmail():
 @app.route('/auth/dfa', methods=['GET', 'POST'])
 def dfa():
     if current_user.is_authenticated:
-        if session['ta'] == 1:
+        if current_user.ta == 1:
             return redirect(url_for('ta_land'))
         else:
             return redirect(url_for('stu_land'))
@@ -94,12 +93,15 @@ def dfa():
         email = session['email']
         form = DFAForm()
         if form.validate_on_submit():
-            if session['otp'] == form.otp.data:
-                user = User(-2, '', email, '', session['ta'])
+            totp = pyotp.TOTP(session['secret_key'], interval=300)
+            if totp.verify(form.otp.data):
                 user = User.getUserFromEmail(email)
                 if user is not None:
                     login_user(user)
-                    return redirect(url_for('stu_land'))
+                    if current_user.ta == 1:
+                        return redirect(url_for('ta_land'))
+                    else:
+                        return redirect(url_for('stu_land'))    
                 else:
                     raise MemoryError("Retrieval error.")
             else:
@@ -115,27 +117,54 @@ def dfa():
 @app.route('/stu/land')
 @login_required
 def stu_land():
-    return render_template('/stu/land.html', title="Student - Home", leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
+    cursor = conn.cursor()
+    get_courses_command = "SELECT * FROM courses WHERE student_id = ?;"
+    cursor.execute(get_courses_command, current_user.id)
+    courses = []
+    for row in cursor:
+        courses.append([row[0], (str(row[1]) + " " + str(row[2]) + " " + str(row[3]))])
+    return render_template('/stu/land.html', title= current_user.username + " - Home", leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']], courses=courses)
+
+@app.route('/stu/<id>/chatbot', methods=['GET', 'POST'])
+def stu_chatbot(id):
+    if request.method == 'POST':
+        if not request.form['question']:
+            return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
+        else:
+            conversation.insert(0, request.form['question'])
+            # send question to that thing and get answer back pls add to convo and render template.
+            return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
+    else:
+        return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
 
 @app.route('/ta/land')
 @login_required
 def ta_land():
-    return render_template('/stu/land.html', title="TA - Home", leftlinks = [['ta_land', 'Home']], rightlinks=[['logout', 'Logout'], ['ta_syl', 'Syllabus']])
+    if current_user.ta != 1:
+        return redirect(url_for('stu_land'))
+    return render_template('/stu/land.html', title= current_user.username + " - Home", leftlinks = [['ta_land', 'Home']], rightlinks=[['logout', 'Logout'], ['ta_syl', 'Syllabus']])
 
 @app.route('/ta/syl', methods=['GET', 'POST'])
 @login_required
 def ta_syl():
+    if current_user.ta != 1:
+        return redirect(url_for('stu_land'))
     form = SyllabusForm()
     if form.validate_on_submit():
+
         return "got the syllabus!"
-    return render_template('ta/syl.html', title="TA - Syllabus", leftlinks = [['ta_land', 'Home']], form=form, rightlinks=[['logout', 'Logout']])
+    return render_template('ta/syl.html', title= current_user.username + " - Syllabus", leftlinks = [['ta_land', 'Home']], form=form, rightlinks=[['logout', 'Logout']])
 
 @app.route('/ta/rules/view')
 @login_required
 def ta_rules_view():
+    if current_user.ta != 1:
+        return redirect(url_for('stu_land'))
     return "rules"
 
 @app.route('/ta/rules/update')
 @login_required
 def ta_rules_update():
+    if current_user.ta != 1:
+        return redirect(url_for('stu_land'))
     return "update"
