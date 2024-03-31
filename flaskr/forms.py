@@ -53,5 +53,5 @@ class DFAForm(FlaskForm):
     submit = SubmitField('Authenticate')
 
 class SyllabusForm(FlaskForm):
-    syllabus = FileField('Upload syllabus', validators=[FileRequired(), FileAllowed(['.pdf'], "Please upload PDF files only.")])
+    syllabus = FileField('Upload syllabus', validators=[FileRequired()])
     submit = SubmitField('Upload')

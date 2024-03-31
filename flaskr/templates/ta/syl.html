@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block body %}
-    <form action="" method="POST" novalidate>
+    <form action="" method="POST" novalidate enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <p>
             {{ form.syllabus.label }}<br>

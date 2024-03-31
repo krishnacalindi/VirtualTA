@@ -150,7 +150,7 @@ def ta_land():
     courses = []
     for row in cursor:
         courses.append([row[0], (str(row[1]) + " " + str(row[2]) + " " + str(row[3]))])
-    return render_template('/ta/land.html', title= current_user.username + " - Home", leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']], courses=courses)
+    return render_template('/ta/land.html', title= current_user.username + " - Home", leftlinks = [['ta_land', 'Home']], rightlinks=[['logout', 'Logout']], courses=courses)
 
 @app.route('/ta/<course_id>')
 @login_required
