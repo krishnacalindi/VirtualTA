@@ -4,5 +4,10 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Welcome to TA landing page!</h1>
+    <h2>TA Courses:</h2>
+    <ul>
+        {% for course in courses %}
+            <li><a href="{{ url_for('ta_course', course_id=course[0]) }}" class="silent_link">{{course[1]}}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock %}

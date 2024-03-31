@@ -1,11 +1,12 @@
 from flask import render_template, url_for, redirect, flash, session, request
-from flaskr import app, mail, conn
+from flaskr import app, mail, conn, blob_service_client, blob_container
 from flaskr.forms import LoginForm, RegisterForm, DFAForm, SyllabusForm
 from flaskr.models import User
 from flask_mail import Message
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash
 import pyotp
+import uuid
 conversation = []
 
 @app.route('/')
@@ -97,6 +98,7 @@ def dfa():
             if totp.verify(form.otp.data):
                 user = User.getUserFromEmail(email)
                 if user is not None:
+                    session.clear()
                     login_user(user)
                     if current_user.ta == 1:
                         return redirect(url_for('ta_land'))
@@ -118,15 +120,15 @@ def dfa():
 @login_required
 def stu_land():
     cursor = conn.cursor()
-    get_courses_command = "SELECT * FROM courses WHERE student_id = ?;"
+    get_courses_command = "SELECT * FROM courses WHERE user_id = ?;"
     cursor.execute(get_courses_command, current_user.id)
     courses = []
     for row in cursor:
         courses.append([row[0], (str(row[1]) + " " + str(row[2]) + " " + str(row[3]))])
     return render_template('/stu/land.html', title= current_user.username + " - Home", leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']], courses=courses)
 
-@app.route('/stu/<id>/chatbot', methods=['GET', 'POST'])
-def stu_chatbot(id):
+@app.route('/stu/<course_id>/chatbot', methods=['GET', 'POST'])
+def stu_chatbot(course_id):
     if request.method == 'POST':
         if not request.form['question']:
             return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
@@ -142,17 +144,40 @@ def stu_chatbot(id):
 def ta_land():
     if current_user.ta != 1:
         return redirect(url_for('stu_land'))
-    return render_template('/stu/land.html', title= current_user.username + " - Home", leftlinks = [['ta_land', 'Home']], rightlinks=[['logout', 'Logout'], ['ta_syl', 'Syllabus']])
+    cursor = conn.cursor()
+    get_courses_command = "SELECT * FROM courses WHERE user_id = ?;"
+    cursor.execute(get_courses_command, current_user.id)
+    courses = []
+    for row in cursor:
+        courses.append([row[0], (str(row[1]) + " " + str(row[2]) + " " + str(row[3]))])
+    return render_template('/ta/land.html', title= current_user.username + " - Home", leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']], courses=courses)
 
-@app.route('/ta/syl', methods=['GET', 'POST'])
+@app.route('/ta/<course_id>')
 @login_required
-def ta_syl():
+def ta_course(course_id):
+    if current_user.ta != 1:
+        return redirect(url_for('stu_land'))
+    return render_template('ta/course.html', title= current_user.username + " - Course Homepage", leftlinks = [['ta_land', 'Home']], rightlinks=[[f"'ta_syl', course_id={course_id}", 'Syllabus'], ['logout', 'Logout']], course_id=course_id)
+
+@app.route('/ta/<course_id>/syl', methods=['GET', 'POST'])
+@login_required
+def ta_syl(course_id):
     if current_user.ta != 1:
         return redirect(url_for('stu_land'))
     form = SyllabusForm()
     if form.validate_on_submit():
-
-        return "got the syllabus!"
+        blob_name = str(uuid.uuid4()) + ".pdf"
+        blob_client = blob_service_client.get_blob_client(container=blob_container, blob=blob_name)
+        try:
+            blob_client.upload_blob(form.syllabus.data, overwrite=True)
+            flash("Syllabus uploaded successfully.")
+            syllabus_info_command = f"INSERT INTO syllabus (file_name, container_name, course_id) VALUES (?, ?, ?);"
+            cursor = conn.cursor()
+            cursor.execute(syllabus_info_command, (blob_name, blob_container, course_id))
+            cursor.commit()
+        except:
+            flash("Error in uploading syllabus.")
+        return redirect(url_for('ta_land'))
     return render_template('ta/syl.html', title= current_user.username + " - Syllabus", leftlinks = [['ta_land', 'Home']], form=form, rightlinks=[['logout', 'Logout']])
 
 @app.route('/ta/rules/view')

@@ -15,3 +15,6 @@ class Config:
     DB_USERNAME = os.environ.get('DB_USERNAME')
     DB_PASSWORD = os.environ.get('DB_PASSWORD')
     DB_DRIVER = os.environ.get('DB_DRIVER')
+    BLOB_ACCOUNT_NAME = os.environ.get('BLOB_ACCOUNT_NAME')
+    BLOB_ACCOUNT_KEY = os.environ.get('BLOB_ACCOUNT_KEY')
+    BLOB_CONTAINER = os.environ.get('BLOB_CONTAINER')
