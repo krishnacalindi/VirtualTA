@@ -134,11 +134,15 @@ def stu_chatbot(course_id):
         if not request.form['question']:
             return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
         else:
+            cursor = conn.cursor()
+            syllabus_name_command = 'SELECT file_name FROM syllabus WHERE course_id = ?;'
+            cursor.execute(syllabus_name_command, (course_id,))
+            file_name = cursor.fetchone()
             question = request.form['question']
-            conversation.insert(0, (str(current_user.username) + ": "  + question))
-            answer = askQuestion(question, "")
-            conversation.insert(0, "Chatbot: " + answer)
-            # send question to that thing and get answer back pls add to convo and render template.
+            answer = askQuestion(question, file_name[0])
+            conversation_answer = "Chatbot: " + answer
+            conversation_question = str(current_user.username) + ": "  + question
+            conversation.insert(0, [conversation_answer, conversation_question])
             return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
     else:
         return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])

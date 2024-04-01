@@ -32,6 +32,5 @@ def get_syllabus_text(syllabusName):
     return text
 
 def askQuestion(question, syllabusName):
-    syllabusName = "ComputerVisionSyllabus.pdf"
     syllabus_text = get_syllabus_text(syllabusName)
     return virtual_ta_question(question, syllabus_text)
