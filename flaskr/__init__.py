@@ -10,7 +10,7 @@ app.config.from_object(Config)
 conn = pyodbc.connect(f'SERVER={Config.DB_SERVER};DATABASE={Config.DB_NAME};UID={Config.DB_USERNAME};PWD={Config.DB_PASSWORD};DRIVER={Config.DB_DRIVER}')
 login = LoginManager(app)
 login.login_view = 'login'
-blob_service_client = BlobServiceClient.from_connection_string(f'DefaultEndpointsProtocol=https;AccountName={Config.BLOB_ACCOUNT_NAME};AccountKey={Config.BLOB_ACCOUNT_KEY};EndpointSuffix=core.windows.net')
+blob_service_client = BlobServiceClient.from_connection_string(Config.BLOB_CONN_STR)
 blob_container = Config.BLOB_CONTAINER
 
 mail = Mail(app)

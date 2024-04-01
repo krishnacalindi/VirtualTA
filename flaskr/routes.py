@@ -135,9 +135,9 @@ def stu_chatbot(course_id):
             return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
         else:
             question = request.form['question']
-            conversation.insert(0, question)
+            conversation.insert(0, (str(current_user.username) + ": "  + question))
             answer = askQuestion(question, "")
-            conversation.insert(0, answer)
+            conversation.insert(0, "Chatbot: " + answer)
             # send question to that thing and get answer back pls add to convo and render template.
             return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
     else:
