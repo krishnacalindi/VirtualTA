@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY')
+    SECRET_KEY = os.getenv('SECRET_KEY')
     MAIL_SERVER = os.getenv('MAIL_SERVER')
     MAIL_PORT = os.getenv('MAIL_PORT')
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
@@ -15,5 +15,4 @@ class Config:
     DB_USERNAME = os.environ.get('DB_USERNAME')
     DB_PASSWORD = os.environ.get('DB_PASSWORD')
     DB_DRIVER = os.environ.get('DB_DRIVER')
-    BLOB_CONN_STR = os.environ.get('BLOB_CONN_STR')
     BLOB_CONTAINER = os.environ.get('BLOB_CONTAINER')
