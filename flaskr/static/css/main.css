@@ -74,6 +74,10 @@ input
         background-color: white;
         
     }
+    &[type="file"]
+    {
+        color: black;
+    }
 }
 .submit_field
 {

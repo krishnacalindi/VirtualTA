@@ -2,6 +2,7 @@ from flask import render_template, url_for, redirect, flash, session, request
 from flaskr import app, mail, conn, blob_service_client, blob_container
 from flaskr.forms import LoginForm, RegisterForm, DFAForm, SyllabusForm
 from flaskr.models import User
+from flaskr.utils import askQuestion
 from flask_mail import Message
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash
@@ -133,7 +134,10 @@ def stu_chatbot(course_id):
         if not request.form['question']:
             return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
         else:
-            conversation.insert(0, request.form['question'])
+            question = request.form['question']
+            conversation.insert(0, question)
+            answer = askQuestion(question, "")
+            conversation.insert(0, answer)
             # send question to that thing and get answer back pls add to convo and render template.
             return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
     else:
@@ -169,13 +173,15 @@ def ta_syl(course_id):
         blob_name = str(uuid.uuid4()) + ".pdf"
         blob_client = blob_service_client.get_blob_client(container=blob_container, blob=blob_name)
         try:
-            blob_client.upload_blob(form.syllabus.data, overwrite=True)
+            with form.syllabus.data.stream as file_stream:
+                blob_client.upload_blob(file_stream, overwrite=True)
             flash("Syllabus uploaded successfully.")
             syllabus_info_command = f"INSERT INTO syllabus (file_name, container_name, course_id) VALUES (?, ?, ?);"
             cursor = conn.cursor()
             cursor.execute(syllabus_info_command, (blob_name, blob_container, course_id))
             cursor.commit()
-        except:
+        except Exception as e:
+            print(str(e))
             flash("Error in uploading syllabus.")
         return redirect(url_for('ta_land'))
     return render_template('ta/syl.html', title= current_user.username + " - Syllabus", leftlinks = [['ta_land', 'Home']], form=form, rightlinks=[['logout', 'Logout']])
