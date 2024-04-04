@@ -138,9 +138,12 @@ def stu_chatbot(course_id):
             syllabus_name_command = 'SELECT file_name FROM syllabus WHERE course_id = ?;'
             cursor.execute(syllabus_name_command, (course_id,))
             file_name = cursor.fetchone()
+            if file_name is None:
+                conversation_answer = "Chatbot: No syllabus uploaded."
+            else:
+                answer = askQuestion(question, file_name[0])
+                conversation_answer = "Chatbot: " + answer
             question = request.form['question']
-            answer = askQuestion(question, file_name[0])
-            conversation_answer = "Chatbot: " + answer
             conversation_question = str(current_user.username) + ": "  + question
             conversation.insert(0, [conversation_answer, conversation_question])
             return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
