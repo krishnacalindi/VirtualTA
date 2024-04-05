@@ -8,7 +8,7 @@ from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash
 import pyotp
 import uuid
-conversation = []
+conversation = {}
 
 @app.route('/')
 def welcome():
@@ -131,9 +131,11 @@ def stu_land():
 
 @app.route('/stu/<course_id>/chatbot', methods=['GET', 'POST'])
 def stu_chatbot(course_id):
+    if course_id not in conversation:
+                conversation[course_id] = []
     if request.method == 'POST':
         if not request.form['question']:
-            return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
+            return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation[course_id], leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
         else:
             cursor = conn.cursor()
             syllabus_name_command = 'SELECT file_name FROM syllabus WHERE course_id = ?;'
@@ -147,9 +149,9 @@ def stu_chatbot(course_id):
                 conversation_answer = "Chatbot: " + answer
             conversation_question = str(current_user.username) + ": "  + question
             conversation[course_id].insert(0, [conversation_answer, conversation_question])
-            return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
+            return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation[course_id], leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
     else:
-        return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
+        return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation[course_id], leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
 
 @app.route('/ta/land')
 @login_required
