@@ -125,6 +125,7 @@ def stu_land():
     cursor.execute(get_courses_command, current_user.id)
     courses = []
     for row in cursor:
+        conversation[row[0]] = []
         courses.append([row[0], (str(row[1]) + " " + str(row[2]) + " " + str(row[3]))])
     return render_template('/stu/land.html', title= current_user.username + " - Home", leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']], courses=courses)
 
@@ -145,7 +146,7 @@ def stu_chatbot(course_id):
                 answer = askQuestion(question, file_name[0])
                 conversation_answer = "Chatbot: " + answer
             conversation_question = str(current_user.username) + ": "  + question
-            conversation.insert(0, [conversation_answer, conversation_question])
+            conversation[course_id].insert(0, [conversation_answer, conversation_question])
             return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
     else:
         return render_template('stu/chatbot.html', title = current_user.username+" - Chatbot", conversation=conversation, leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']])
