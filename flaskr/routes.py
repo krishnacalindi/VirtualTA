@@ -1,6 +1,6 @@
 from flask import render_template, url_for, redirect, flash, session, request
 from flaskr import app, mail, conn, blob_service_client, blob_container
-from flaskr.forms import LoginForm, RegisterForm, DFAForm, SyllabusForm
+from flaskr.forms import LoginForm, RegisterForm, DFAForm, SyllabusForm, AddForm
 from flaskr.models import User
 from flaskr.utils import askQuestion
 from flask_mail import Message
@@ -121,12 +121,16 @@ def dfa():
 @login_required
 def stu_land():
     cursor = conn.cursor()
-    get_courses_command = "SELECT * FROM courses WHERE user_id = ?;"
-    cursor.execute(get_courses_command, current_user.id)
+    get_courses_command = "SELECT * FROM course_population WHERE user_id = ?;"
+    cursor.execute(get_courses_command, (current_user.id,))
+    courselist = cursor.fetchall()
     courses = []
-    for row in cursor:
+    for row in courselist:
         conversation[row[0]] = []
-        courses.append([row[0], (str(row[1]) + " " + str(row[2]) + " " + str(row[3]))])
+        get_course_info = "SELECT * from courses where course_id = ?;"
+        cursor.execute(get_course_info, (row[0],))
+        course_info = cursor.fetchone()
+        courses.append([course_info[0], (str(course_info[1]) + " " + str(course_info[2]) + " " + str(course_info[3]))])
     if current_user.ta == 1:
         return render_template('/stu/land.html', title= current_user.username + " - Home", leftlinks = [['stu_land', 'Home'], ['ta_land', 'TA View']], rightlinks=[['logout', 'Logout']], courses=courses)
     return render_template('/stu/land.html', title= current_user.username + " - Home", leftlinks = [['stu_land', 'Home']], rightlinks=[['logout', 'Logout']], courses=courses)
@@ -161,11 +165,16 @@ def ta_land():
     if current_user.ta != 1:
         return redirect(url_for('stu_land'))
     cursor = conn.cursor()
-    get_courses_command = "SELECT * FROM courses WHERE user_id = ?;"
-    cursor.execute(get_courses_command, current_user.id)
+    get_courses_command = "SELECT * FROM course_population WHERE user_id = ?;"
+    cursor.execute(get_courses_command, (current_user.id,))
+    courselist = cursor.fetchall()
     courses = []
-    for row in cursor:
-        courses.append([row[0], (str(row[1]) + " " + str(row[2]) + " " + str(row[3]))])
+    for row in courselist:
+        conversation[row[0]] = []
+        get_course_info = "SELECT * from courses where course_id = ?;"
+        cursor.execute(get_course_info, (row[0],))
+        course_info = cursor.fetchone()
+        courses.append([course_info[0], (str(course_info[1]) + " " + str(course_info[2]) + " " + str(course_info[3]))])
     return render_template('/ta/land.html', title= current_user.username + " - Home", leftlinks = [['ta_land', 'Home'], ['stu_land', 'Student View']], rightlinks=[['logout', 'Logout']], courses=courses)
 
 @app.route('/ta/<course_id>')
@@ -173,7 +182,7 @@ def ta_land():
 def ta_course(course_id):
     if current_user.ta != 1:
         return redirect(url_for('stu_land'))
-    return render_template('ta/course.html', title= current_user.username + " - Course Homepage", leftlinks = [['ta_land', 'Home']], rightlinks=[[f"'ta_syl', course_id={course_id}", 'Syllabus'], ['logout', 'Logout']], course_id=course_id)
+    return render_template('ta/course.html', title= current_user.username + " - Course Homepage", leftlinks = [['ta_land', 'Home']], rightlinks=[['logout', 'Logout']], course_id=course_id, syllabus_link=url_for('ta_syl', course_id=course_id), add_link=url_for('ta_add', course_id=course_id))
 
 @app.route('/ta/<course_id>/syl', methods=['GET', 'POST'])
 @login_required
@@ -198,16 +207,29 @@ def ta_syl(course_id):
         return redirect(url_for('ta_land'))
     return render_template('ta/syl.html', title= current_user.username + " - Syllabus", leftlinks = [['ta_land', 'Home']], form=form, rightlinks=[['logout', 'Logout']])
 
-@app.route('/ta/rules/view')
+@app.route('/ta/<course_id>/add', methods=['GET', 'POST'])
 @login_required
-def ta_rules_view():
+def ta_add(course_id):
     if current_user.ta != 1:
         return redirect(url_for('stu_land'))
-    return "rules"
-
-@app.route('/ta/rules/update')
-@login_required
-def ta_rules_update():
-    if current_user.ta != 1:
-        return redirect(url_for('stu_land'))
-    return "update"
+    form = AddForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        get_student_command = "SELECT id from user_info where username = ?;"
+        cursor = conn.cursor()
+        cursor.execute(get_student_command, (username,))
+        id = cursor.fetchone()[0]
+        if id is None:
+            flash("Student username does not exist.")
+            redirect(url_for('ta_course', course_id=course_id))
+        else:
+            add_student_command = "INSERT INTO course_population (course_id, user_id) VALUES (?, ?);"
+            try:
+                cursor.execute(add_student_command, (course_id, id))
+                cursor.commit()
+                flash("Student added successfully.")
+                redirect(url_for('ta_course', course_id=course_id))
+            except:
+                flash("Error occured while adding student.")
+                redirect(url_for('ta_course', course_id=course_id))
+    return render_template('ta/add.html', title= current_user.username + " - Add Student", leftlinks = [['ta_land', 'Home']], form=form, rightlinks=[['logout', 'Logout']])

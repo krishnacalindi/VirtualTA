@@ -27,17 +27,7 @@ background-image: linear-gradient(155deg, #202020 0%, black 100%); color: #f5f5f
         </div>
         <div id="base_header_right">
             {% for link in rightlinks %}
-            {% set link_parts = link[0].split(', ') %}
-            {% set route_name = link_parts[0].strip("'") %}
-            {% set params_str = link_parts[1] if link_parts|length > 1 else '' %}
-            {% set params_dict = {} %} 
-            {% if params_str %}
-                {% for item in params_str.split(', ') %}
-                    {% set param_parts = item.split('=') %}
-                    {% set _ = params_dict.update({param_parts[0]: param_parts[1]}) %}
-                {% endfor %}
-            {% endif %}
-            <a href="{{ url_for(route_name, **params_dict) }}" class="silent_link">{{ link[1] }}</a>
+                <a href="{{ url_for(link[0]) }}" class="silent_link">{{link[1]}}</a>
             {% endfor %} 
         </div>
     </div>
