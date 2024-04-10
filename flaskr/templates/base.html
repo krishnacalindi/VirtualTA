@@ -10,6 +10,8 @@
     <title>VirtualTA</title>
     {% endif %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <!-- Link to comets.css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/comets.css') }}">
     {% block head %}{% endblock %}
 </head>
 <body style="font-family: Verdana, Geneva, Tahoma, sans-serif; display: flex; flex-direction: column;margin: 0; 
@@ -49,6 +51,8 @@ background-image: linear-gradient(155deg, #202020 0%, black 100%); color: #f5f5f
     {% endif %}
   {% endwith %}
     <div id="base_body">
+        <!-- Elements for stars and comets -->
+            <div class="background-animation" id="background-animation"></div>
         {% block body %}{% endblock %}
     </div>
     <div id="base_footer">
@@ -61,5 +65,37 @@ background-image: linear-gradient(155deg, #202020 0%, black 100%); color: #f5f5f
         <p style="margin:0">University: <a href="https://www.utdallas.edu/" class="silent_link" target="_blank">The University of Texas at Dallas</a>, 
         <a href="https://engineering.utdallas.edu/" class="silent_link" target="_blank">Eric Jonsson School of Engineering and Computer Science</a></p>
     </div>
+    <script>
+        // Function to generate random number between min and max
+        function getRandom(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        // Function to create stars and comets
+        function createStarsAndComets(numStars, numComets) {
+            const container = document.getElementById('background-animation');
+            
+            // Create stars
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.top = `${getRandom(0, 100)}%`;
+                star.style.left = `${getRandom(0, 100)}%`;
+                container.appendChild(star);
+            }
+            
+            // Create comets
+            for (let i = 0; i < numComets; i++) {
+                const comet = document.createElement('div');
+                comet.classList.add('comet');
+                comet.style.top = `${getRandom(0, 100)}%`;
+                comet.style.left = `${getRandom(0, 100)}%`;
+                container.appendChild(comet);
+            }
+        }
+        
+        // Call the function to create stars and comets
+        createStarsAndComets(100, 3); // Adjust the numbers as needed
+    </script>
 </body>
 </html>
