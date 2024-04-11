@@ -25,9 +25,9 @@
     height: 4px; /* Height of the comet's head */
     border-radius: 50%; /* Make the head round */
     animation: comet-move 3s linear infinite; /* Adjust duration and timing function */
-    background: radial-gradient(circle, #ff9933, #0cc663); /* Gradient effect for the comet's tail */
+    background: radial-gradient(circle, #ff9933, #06a852); /* Gradient effect for the comet's tail */
     filter: blur(2px); /* Add a blurry tail effect */
-    box-shadow: 0 0 10px 2px #ff9933, 0 0 15px 3px #0cc663; /* Add a glowing effect */
+    box-shadow: 0 0 10px 2px #ff9933, 0 0 15px 3px #039a49; /* Add a glowing effect */
     mix-blend-mode: overlay; /* Blend mode to enhance glow */
     transform-origin: center; /* Set transform origin to center */
 }

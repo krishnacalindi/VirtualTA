@@ -65,8 +65,8 @@
 input
 {
     width: 30vw;
-    padding: 5px;
-    border-radius: 5px;
+    padding: 10px;
+    border-radius: 20px;
     border: solid;
     background-color: beige;
     &:focus
@@ -79,17 +79,18 @@ input
         color: black;
     }
 }
-.submit_field
-{
-    background-color: beige;
-    width: fit-content;
-    padding: 10px;
+.submit_field {
+    background-color: rgb(228, 83, 16);
+    width: 33vw; 
+    padding: 7px;
     font-size: 15px;
     font-weight: bold;
-    &:hover
-    {
+    border-radius: 20px;
+    border: solid;
+    border-color: transparent; 
+    &:hover {
         cursor: pointer;
-        background-color: white;
+        background-color: rgb(5, 56, 3);
     }
 }
 .form_error_message
