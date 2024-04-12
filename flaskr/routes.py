@@ -233,3 +233,10 @@ def ta_add(course_id):
                 flash("Error occured while adding student.")
                 redirect(url_for('ta_course', course_id=course_id))
     return render_template('ta/add.html', title= current_user.username + " - Add Student", leftlinks = [['ta_land', 'Home']], form=form, rightlinks=[['logout', 'Logout']])
+
+@app.errorhandler(Exception)
+def error_handling(error):
+    logout()
+    session.clear()
+    flash("An unexpected error occured.")
+    return redirect(url_for('welcome'))
