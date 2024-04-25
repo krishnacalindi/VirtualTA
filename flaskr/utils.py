@@ -12,7 +12,7 @@ def virtual_ta_question(question, syllabus_text):
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are a teaching assistant for university level courses at the University of Texas at Dallas. Provide concise responses unless otherwise instructed by the student. Cite your responses, page number / line number from syllabus."},
+            {"role": "system", "content": "You are a teaching assistant for university level courses at the University of Texas at Dallas. Provide concise responses unless otherwise instructed by the student. Cite your responses from the syllabus in the format (Section, Page Number). Do not answer questions outside the scope of the syllabus content."},
             {"role": "system", "content": syllabus_text},  # Adding syllabus text as context
             {"role": "user", "content": question},
         ]
