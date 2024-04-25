@@ -24,7 +24,7 @@
         {% if messages %}
             <div id="flash-messages">
                 {% for message in messages %}
-                    <div class="flash-message form_error_message">{{ message }}</div>
+                <div class="flash-message flash-{{ category }}">{{ message }}</div>
                 {% endfor %}
             </div>        
         {% endif %}

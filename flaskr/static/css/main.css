@@ -158,7 +158,7 @@ input
 }
 
 /* Base styles for flash messages */
-.flash-message, .form_error_message,.flash-info {
+.form_error_message {
     padding: 10px;
     margin-bottom: 20px;
     border: 4px solid #db1713;
@@ -168,21 +168,22 @@ input
     width: auto; 
 }
 
-
 /* Color coding for different message types */
-.flash-info {
-    background-color: #d9edf7;
-    color: #31708f;
-    border-color: #bce8f1;
-}
 .flash-error {
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 4px solid #db1713;
+    border-radius: 4px;
     background-color: #f2dede; 
     color: #a94442;
-    border-color: #db1713; 
+     
 }
 .flash-success {
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 4px solid #b2e18c;
+    border-radius: 4px;
     background-color: #dff0d8;
     color: #3c763d;
-    border-color: #d6e9c6;
 }
 

@@ -30,7 +30,7 @@ def login():
     if form.validate_on_submit():
         user = User.getUser(form.username.data, form.password.data)
         if user is None:
-            flash('Incorrect username or password.')
+            flash("Incorrect username or password", 'error')
             return redirect(url_for('login'))
         else:
             session['email'] = user.email
@@ -48,10 +48,10 @@ def register():
     if form.validate_on_submit():
         user = User.createUser(form.username.data, form.email.data, generate_password_hash(form.password.data))
         if user is None:
-            flash("An error occured while registering user.")
+            flash("An error occured while registering user",'error')
             return redirect(url_for('register'))
         else:
-            flash("Successfully registered user.")
+            flash("Successfully registered user", 'success')
             return redirect(url_for('login'))
     return render_template('auth/register.html', title="Register", form=form, leftlinks = [['welcome', 'Home']], rightlinks=[['login', 'Login']])
 
@@ -81,7 +81,7 @@ def sendmail():
         return redirect(url_for('dfa')) 
     except:
         session.clear()
-        flash('An error occured.')
+        flash('An error occured', 'error')
         return redirect(url_for('welcome'))
 
 @app.route('/auth/dfa', methods=['GET', 'POST'])
@@ -106,15 +106,15 @@ def dfa():
                     else:
                         return redirect(url_for('stu_land'))    
                 else:
-                    raise MemoryError("Retrieval error.")
+                    raise MemoryError("Retrieval error",'error')
             else:
                 session.clear()
-                flash('Incorrect one time password.')
+                flash('Incorrect one time password','error')
                 return redirect(url_for('login'))
         return render_template('auth/dfa.html', title="Dual Factor Authentication", form=form)
     except:
         session.clear()
-        flash('An error occured.')
+        flash('An error occured','error')
         return redirect(url_for('welcome'))
 
 @app.route('/stu/land')
@@ -196,14 +196,14 @@ def ta_syl(course_id):
         try:
             with form.syllabus.data.stream as file_stream:
                 blob_client.upload_blob(file_stream, overwrite=True)
-            flash("Syllabus uploaded successfully.")
+            flash("Syllabus uploaded successfully",'success')
             syllabus_info_command = f"INSERT INTO syllabus (file_name, container_name, course_id) VALUES (?, ?, ?);"
             cursor = conn.cursor()
             cursor.execute(syllabus_info_command, (blob_name, blob_container, course_id))
             cursor.commit()
         except Exception as e:
             print(str(e))
-            flash("Error in uploading syllabus.")
+            flash("Error in uploading syllabus",'error')
         return redirect(url_for('ta_land'))
     return render_template('ta/syl.html', title= current_user.username + " - Syllabus", leftlinks = [['ta_land', 'Home']], form=form, rightlinks=[['logout', 'Logout']])
 
@@ -220,17 +220,17 @@ def ta_add(course_id):
         cursor.execute(get_student_command, (username,))
         id = cursor.fetchone()[0]
         if id is None:
-            flash("Student username does not exist.")
+            flash("Student username does not exist",'error')
             redirect(url_for('ta_course', course_id=course_id))
         else:
             add_student_command = "INSERT INTO course_population (course_id, user_id) VALUES (?, ?);"
             try:
                 cursor.execute(add_student_command, (course_id, id))
                 cursor.commit()
-                flash("Student added successfully.")
+                flash("Student added successfully",'success')
                 redirect(url_for('ta_course', course_id=course_id))
             except:
-                flash("Error occured while adding student.")
+                flash("Error occured while adding student",'error')
                 redirect(url_for('ta_course', course_id=course_id))
     return render_template('ta/add.html', title= current_user.username + " - Add Student", leftlinks = [['ta_land', 'Home']], form=form, rightlinks=[['logout', 'Logout']])
 
@@ -238,5 +238,5 @@ def ta_add(course_id):
 def error_handling(error):
     logout()
     session.clear()
-    flash("An unexpected error occured.")
+    flash("An unexpected error occured",'error')
     return redirect(url_for('welcome'))
