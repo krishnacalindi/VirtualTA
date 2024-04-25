@@ -18,5 +18,16 @@
             {% endfor %}
         </p>
         <p>{{ form.submit(class="submit_field") }}</p>
+
+        <!-- Flash Messages Display Below the Button -->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div id="flash-messages">
+                {% for message in messages %}
+                    <div class="flash-message form_error_message">{{ message }}</div>
+                {% endfor %}
+            </div>        
+        {% endif %}
+        {% endwith %}
     </form>
 {% endblock %}
